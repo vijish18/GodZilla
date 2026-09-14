@@ -15,10 +15,10 @@ typecheck:
 	$(PYTHON) -m mypy src
 
 test:
-	$(PYTHON) -m pytest -m unit
+	$(PYTHON) -m pytest
 
 coverage:
-	$(PYTHON) -m pytest -m unit --cov=godzilla --cov-report=term-missing --cov-fail-under=85
+	$(PYTHON) -m pytest --cov=godzilla --cov-report=term-missing --cov-fail-under=85
 
 run:
 	$(PYTHON) -m godzilla run --config-dir config
@@ -42,4 +42,4 @@ ci:
 	$(PYTHON) -m ruff format --check .
 	$(PYTHON) -m ruff check .
 	$(PYTHON) -m mypy src
-	$(PYTHON) -m pytest -m unit --cov=godzilla --cov-report=term-missing --cov-fail-under=85
+	$(PYTHON) -m pytest --cov=godzilla --cov-report=term-missing --cov-fail-under=85

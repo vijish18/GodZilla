@@ -1,4 +1,9 @@
 mode: PAPER
+data_quality:
+  # Research/paper quality screening values, not calibrated production thresholds.
+  abnormal_gap_fraction: "0.10"
+  abnormal_volume_multiple: "10"
+  normalization_version: ohlcv-v1
 starting_values_notice: >-
   Conservative engineering starting values for research and paper trading only;
   they are unoptimized and require evidence plus explicit approval before LIVE use.

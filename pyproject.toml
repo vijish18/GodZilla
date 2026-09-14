@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "godzilla-quant"
-version = "0.2.0"
+version = "0.3.0"
 description = "Fail-closed operational metadata foundation for Project GodZilla"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -28,6 +28,7 @@ dev = [
 
 [project.scripts]
 godzilla = "godzilla.app.cli:main"
+godzilla-replay = "godzilla.market_data.replay_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

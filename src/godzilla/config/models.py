@@ -10,10 +10,12 @@ from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import BaseModel, Field, SecretStr, field_validator, model_validator
+from pydantic_core import to_jsonable_python
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
 from godzilla.compliance.models import ComplianceProfile
 from godzilla.config.modes import SystemState, TradingMode
+from godzilla.market_data.quality import DataQualitySettings
 
 __all__ = ["Settings", "SystemState", "TradingMode"]
 
@@ -161,6 +163,7 @@ class Settings(BaseSettings):
     logging: LoggingSettings = LoggingSettings()
     production: ProductionSettings = ProductionSettings()
     compliance: ComplianceProfile
+    data_quality: DataQualitySettings = DataQualitySettings()
     secrets: SecretSettings = SecretSettings()
 
     @field_validator("mode", mode="before")
@@ -207,6 +210,20 @@ class Settings(BaseSettings):
         return self
 
     def config_hash(self) -> str:
-        payload = self.model_dump(mode="json", exclude={"secrets"})
+        payload = _canonical_value(self.model_dump(mode="python", exclude={"secrets"}))
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _canonical_value(value: object) -> object:
+    """Preserve sequence order but canonicalize unordered sets before JSON conversion."""
+    if isinstance(value, dict):
+        return {str(key): _canonical_value(item) for key, item in value.items()}
+    if isinstance(value, (set, frozenset)):
+        return sorted(
+            (_canonical_value(item) for item in value),
+            key=lambda item: json.dumps(item, sort_keys=True),
+        )
+    if isinstance(value, (list, tuple)):
+        return [_canonical_value(item) for item in value]
+    return to_jsonable_python(value)

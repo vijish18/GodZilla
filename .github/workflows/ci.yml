@@ -26,4 +26,4 @@ jobs:
       - name: Type check
         run: python -m mypy src
       - name: Tests and coverage
-        run: python -m pytest -m unit --cov=godzilla --cov-report=term-missing --cov-fail-under=85
+        run: python -m pytest --cov=godzilla --cov-report=term-missing --cov-fail-under=85

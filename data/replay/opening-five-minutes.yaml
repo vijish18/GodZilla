@@ -1,0 +1,11 @@
+schema_version: "1"
+snapshot_id: synthetic-opening-v1
+source_reference: Synthetic NSE session excerpt; no live vendor data
+bars:
+  - {instrument_id: DEMO, source: fixture, start: '2026-09-15T09:15:00+05:30', end: '2026-09-15T09:16:00+05:30', received_at: '2026-09-15T09:16:00+05:30', interval_minutes: 1, open: '100', high: '102', low: '99', close: '101', volume: '100'}
+  - {instrument_id: DEMO, source: fixture, start: '2026-09-15T09:16:00+05:30', end: '2026-09-15T09:17:00+05:30', received_at: '2026-09-15T09:17:00+05:30', interval_minutes: 1, open: '101', high: '103', low: '100', close: '102', volume: '110'}
+  - {instrument_id: DEMO, source: fixture, start: '2026-09-15T09:17:00+05:30', end: '2026-09-15T09:18:00+05:30', received_at: '2026-09-15T09:18:00+05:30', interval_minutes: 1, open: '102', high: '104', low: '101', close: '103', volume: '120'}
+  - {instrument_id: DEMO, source: fixture, start: '2026-09-15T09:18:00+05:30', end: '2026-09-15T09:19:00+05:30', received_at: '2026-09-15T09:19:00+05:30', interval_minutes: 1, open: '103', high: '105', low: '102', close: '104', volume: '130'}
+  - {instrument_id: DEMO, source: fixture, start: '2026-09-15T09:19:00+05:30', end: '2026-09-15T09:20:00+05:30', received_at: '2026-09-15T09:20:00+05:30', interval_minutes: 1, open: '104', high: '106', low: '103', close: '105', volume: '140'}
+quotes:
+  - {instrument_id: DEMO, source: fixture, timestamp: '2026-09-15T09:20:00+05:30', received_at: '2026-09-15T09:20:00+05:30', bid: '104.95', ask: '105.05', last: '105'}
