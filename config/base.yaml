@@ -1,0 +1,53 @@
+mode: PAPER
+starting_values_notice: >-
+  Conservative engineering starting values for research and paper trading only;
+  they are unoptimized and require evidence plus explicit approval before LIVE use.
+market:
+  exchange: NSE
+  timezone: Asia/Kolkata
+  raw_bar: 1m
+  decision_bar: 5m
+  stabilization_minutes: 15
+  final_entry_time: "15:00"
+  flatten_start_time: "15:10"
+  hard_flatten_deadline: "15:24"
+universe:
+  require_fo_eligibility_for_short: true
+  liquidity_percentile_min: 0.70
+  max_spread_bps: 12
+  max_adv_participation: 0.0025
+alphas:
+  cross_sectional_momentum: ENABLED
+  momentum_breakout: ENABLED
+  pairs_stat_arb: RESEARCH_ONLY
+  vwap_mean_reversion: RESEARCH_ONLY
+  sector_relative_value: RESEARCH_ONLY
+  max_alpha_capital_fraction: 0.40
+risk:
+  directional_risk_per_trade: 0.0025
+  pair_risk_per_trade: 0.0025
+  max_open_portfolio_risk: 0.0100
+  max_positions: 4
+  max_positions_per_sector: 2
+  max_gross_notional: 1.00
+  max_net_directional: 0.60
+  daily_soft_loss: 0.0075
+  daily_hard_loss: 0.0125
+  weekly_hard_loss: 0.0300
+  max_peak_drawdown: 0.0600
+  leverage_enabled: false
+execution:
+  market_orders_assumed_allowed: false
+  max_order_retries: 3
+  max_slippage_bps: 15
+  quote_stale_seconds: 3
+  reconcile_on_unknown: true
+  single_active_executor: true
+logging:
+  level: INFO
+  local_path: null
+production:
+  deployment_approved: false
+  live_trading_enabled: false
+  leader_election_configured: false
+  release_id: null

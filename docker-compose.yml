@@ -1,0 +1,11 @@
+services:
+  godzilla:
+    build:
+      context: .
+    command: ["godzilla", "run", "--config-dir", "/app/config"]
+    environment:
+      GODZILLA_MODE: PAPER
+    init: true
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/config:ro

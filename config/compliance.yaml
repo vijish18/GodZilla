@@ -1,0 +1,10 @@
+compliance:
+  profile_version: null
+  broker_name: null
+  verified_at_utc: null
+  client_api_approved: false
+  static_ip_registered: false
+  order_types_verified: false
+  short_route_verified: false
+  session_logout_verified: false
+  rate_limits_verified: false

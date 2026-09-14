@@ -1,0 +1,8 @@
+mode: LIVE
+logging:
+  level: INFO
+production:
+  deployment_approved: false
+  live_trading_enabled: false
+  leader_election_configured: false
+  release_id: null
