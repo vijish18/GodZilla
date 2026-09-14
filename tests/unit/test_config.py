@@ -59,30 +59,33 @@ def test_live_is_blocked_without_production_and_compliance_prerequisites() -> No
         load_settings(CONFIG_DIR, TradingMode.LIVE)
 
 
-def test_live_validates_only_with_all_affirmative_prerequisites(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    overrides = {
-        "GODZILLA_PRODUCTION__DEPLOYMENT_APPROVED": "true",
-        "GODZILLA_PRODUCTION__LIVE_TRADING_ENABLED": "true",
-        "GODZILLA_PRODUCTION__LEADER_ELECTION_CONFIGURED": "true",
-        "GODZILLA_PRODUCTION__RELEASE_ID": "release-verified",
-        "GODZILLA_COMPLIANCE__PROFILE_VERSION": "2026-09-14",
-        "GODZILLA_COMPLIANCE__BROKER_NAME": "verified-broker",
-        "GODZILLA_COMPLIANCE__VERIFIED_AT_UTC": "2026-09-14T12:00:00Z",
-        "GODZILLA_COMPLIANCE__CLIENT_API_APPROVED": "true",
-        "GODZILLA_COMPLIANCE__STATIC_IP_REGISTERED": "true",
-        "GODZILLA_COMPLIANCE__ORDER_TYPES_VERIFIED": "true",
-        "GODZILLA_COMPLIANCE__SHORT_ROUTE_VERIFIED": "true",
-        "GODZILLA_COMPLIANCE__SESSION_LOGOUT_VERIFIED": "true",
-        "GODZILLA_COMPLIANCE__RATE_LIMITS_VERIFIED": "true",
-        "GODZILLA_SECRETS__BROKER_API_KEY": "test-only-key",
-        "GODZILLA_SECRETS__BROKER_ACCESS_TOKEN": "test-only-token",
+def test_live_validates_only_with_all_affirmative_prerequisites() -> None:
+    payload = load_settings(CONFIG_DIR).model_dump()
+    payload["mode"] = "LIVE"
+    payload["production"] = {
+        "deployment_approved": True,
+        "live_trading_enabled": True,
+        "leader_election_configured": True,
+        "release_id": "release-verified",
     }
-    for name, value in overrides.items():
-        monkeypatch.setenv(name, value)
-
-    settings = load_settings(CONFIG_DIR, TradingMode.LIVE)
+    payload["compliance"].update(
+        {
+            "broker_route": "CLIENT_DIRECT_API",
+            "static_ip_required": True,
+            "static_ip_registered": True,
+            "live_allowed": True,
+        }
+    )
+    payload["compliance"]["api_tagging"] = {
+        "required": True,
+        "scheme": "verified-test-scheme",
+        "verified": True,
+    }
+    payload["secrets"] = {
+        "broker_api_key": "test-only-key",
+        "broker_access_token": "test-only-token",
+    }
+    settings = Settings.model_validate(payload)
     assert settings.mode is TradingMode.LIVE
     assert settings.production.live_trading_enabled is True
 

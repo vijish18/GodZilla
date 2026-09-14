@@ -1,0 +1,13 @@
+mappings:
+  - broker: LOCAL_PAPER_SIMULATOR
+    exchange: NSE
+    instrument_token: "100001"
+    broker_symbol: NSE:LIQUIDFO
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+  - broker: LOCAL_PAPER_SIMULATOR
+    exchange: NSE
+    instrument_token: "100002"
+    broker_symbol: NSE:CASHONLY
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31

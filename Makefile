@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install lint format typecheck test coverage run config-check docker-build docker-up docker-down ci
+.PHONY: install lint format typecheck test coverage run config-check snapshot-check docker-build docker-up docker-down ci
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -25,6 +25,9 @@ run:
 
 config-check:
 	$(PYTHON) -m godzilla config-check --config-dir config
+
+snapshot-check:
+	$(PYTHON) -m godzilla snapshot-check --config-dir config
 
 docker-build:
 	docker compose build

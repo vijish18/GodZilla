@@ -12,6 +12,7 @@ RUN groupadd --system godzilla \
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY config ./config
+COPY data ./data
 
 RUN python -m pip install --upgrade pip \
     && python -m pip install . \

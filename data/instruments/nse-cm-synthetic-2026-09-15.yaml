@@ -1,0 +1,93 @@
+snapshot_id: synthetic-nse-cm-2026-09-15
+version: "fixture-v1"
+exchange: NSE
+as_of: 2026-09-15
+generated_at: 2026-09-15T00:00:00Z
+source_reference: deterministic local test fixture; not exchange production data
+instruments:
+  - symbol: LIQUIDFO
+    token: "100001"
+    isin: INE000A01001
+    exchange: NSE
+    segment: CM
+    tick_size: "0.05"
+    status: ACTIVE
+    fo_eligible: true
+    sector: FINANCIAL_SERVICES
+    price_band: {lower: "80.00", upper: "120.00", category: 20_PERCENT}
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+  - symbol: CASHONLY
+    token: "100002"
+    isin: INE000A01002
+    exchange: NSE
+    segment: CM
+    tick_size: "0.05"
+    status: ACTIVE
+    fo_eligible: false
+    sector: CONSUMER
+    price_band: {category: NO_BAND_FIXTURE}
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+  - symbol: SUSPENDED
+    token: "100003"
+    isin: INE000A01003
+    exchange: NSE
+    segment: CM
+    tick_size: "0.05"
+    status: SUSPENDED
+    fo_eligible: true
+    sector: INDUSTRIALS
+    price_band: {category: FIXTURE}
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+  - symbol: WATCH
+    token: "100004"
+    isin: INE000A01004
+    exchange: NSE
+    segment: CM
+    tick_size: "0.10"
+    status: ACTIVE
+    fo_eligible: true
+    sector: ENERGY
+    price_band: {category: FIXTURE}
+    surveillance: true
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+  - symbol: AMBIGUOUS
+    token: "100005"
+    isin: INE000A01005
+    exchange: NSE
+    segment: CM
+    tick_size: "0.05"
+    status: ACTIVE
+    fo_eligible: true
+    sector: TECHNOLOGY
+    price_band: {category: FIXTURE}
+    data_ambiguous: true
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+  - symbol: FUTURE
+    token: "100006"
+    isin: INE000A01006
+    exchange: NSE
+    segment: CM
+    tick_size: "0.05"
+    status: ACTIVE
+    fo_eligible: true
+    sector: HEALTHCARE
+    price_band: {category: FIXTURE}
+    effective_from: 2026-10-01
+    effective_to: 2026-12-31
+  - symbol: UNTRADABLE
+    token: "100007"
+    isin: INE000A01007
+    exchange: NSE
+    segment: CM
+    tick_size: "0.05"
+    status: UNTRADABLE
+    fo_eligible: true
+    sector: MATERIALS
+    price_band: {category: FIXTURE}
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31

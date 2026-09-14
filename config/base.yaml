@@ -16,6 +16,10 @@ universe:
   liquidity_percentile_min: 0.70
   max_spread_bps: 12
   max_adv_participation: 0.0025
+  excluded_symbols: []
+  excluded_sectors: []
+  exclude_surveillance: true
+  exclude_data_ambiguity: true
 alphas:
   cross_sectional_momentum: ENABLED
   momentum_breakout: ENABLED

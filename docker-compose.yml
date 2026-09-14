@@ -9,3 +9,4 @@ services:
     restart: unless-stopped
     volumes:
       - ./config:/app/config:ro
+      - ./data:/app/data:ro

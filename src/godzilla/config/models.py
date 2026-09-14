@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, time
+from datetime import time
 from enum import StrEnum
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -12,22 +12,10 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import BaseModel, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
+from godzilla.compliance.models import ComplianceProfile
+from godzilla.config.modes import SystemState, TradingMode
 
-class TradingMode(StrEnum):
-    RESEARCH = "RESEARCH"
-    BACKTEST = "BACKTEST"
-    PAPER = "PAPER"
-    LIVE = "LIVE"
-
-
-class SystemState(StrEnum):
-    STARTING = "STARTING"
-    READY = "READY"
-    DEGRADED = "DEGRADED"
-    HALTED = "HALTED"
-    EMERGENCY = "EMERGENCY"
-    STOPPING = "STOPPING"
-    STOPPED = "STOPPED"
+__all__ = ["Settings", "SystemState", "TradingMode"]
 
 
 class AlphaAvailability(StrEnum):
@@ -70,6 +58,10 @@ class UniverseSettings(BaseModel):
     liquidity_percentile_min: float = Field(ge=0, le=1)
     max_spread_bps: int = Field(gt=0)
     max_adv_participation: float = Field(gt=0, le=1)
+    excluded_symbols: frozenset[str] = frozenset()
+    excluded_sectors: frozenset[str] = frozenset()
+    exclude_surveillance: bool = True
+    exclude_data_ambiguity: bool = True
 
 
 class AlphaSettings(BaseModel):
@@ -135,42 +127,6 @@ class ProductionSettings(BaseModel):
     release_id: str | None = None
 
 
-class ComplianceSettings(BaseModel):
-    profile_version: str | None = None
-    broker_name: str | None = None
-    verified_at_utc: datetime | None = None
-    client_api_approved: bool = False
-    static_ip_registered: bool = False
-    order_types_verified: bool = False
-    short_route_verified: bool = False
-    session_logout_verified: bool = False
-    rate_limits_verified: bool = False
-
-    @field_validator("verified_at_utc")
-    @classmethod
-    def verified_at_must_be_aware(cls, value: datetime | None) -> datetime | None:
-        if value is not None and (value.tzinfo is None or value.utcoffset() is None):
-            raise ValueError("verified_at_utc must be timezone-aware")
-        return value
-
-    def missing_live_requirements(self) -> list[str]:
-        missing: list[str] = []
-        for name in ("profile_version", "broker_name", "verified_at_utc"):
-            if getattr(self, name) in (None, ""):
-                missing.append(f"compliance.{name}")
-        for name in (
-            "client_api_approved",
-            "static_ip_registered",
-            "order_types_verified",
-            "short_route_verified",
-            "session_logout_verified",
-            "rate_limits_verified",
-        ):
-            if not getattr(self, name):
-                missing.append(f"compliance.{name}")
-        return missing
-
-
 class SecretSettings(BaseModel):
     broker_api_key: SecretStr | None = Field(default=None, exclude=True)
     broker_access_token: SecretStr | None = Field(default=None, exclude=True)
@@ -204,7 +160,7 @@ class Settings(BaseSettings):
     execution: ExecutionSettings
     logging: LoggingSettings = LoggingSettings()
     production: ProductionSettings = ProductionSettings()
-    compliance: ComplianceSettings = ComplianceSettings()
+    compliance: ComplianceProfile
     secrets: SecretSettings = SecretSettings()
 
     @field_validator("mode", mode="before")
@@ -229,7 +185,7 @@ class Settings(BaseSettings):
         if self.mode is not TradingMode.LIVE:
             return self
 
-        missing = self.compliance.missing_live_requirements()
+        missing = list(self.compliance.structural_issues(self.mode))
         missing.extend(self.secrets.missing_live_requirements())
         for name in ("deployment_approved", "live_trading_enabled", "leader_election_configured"):
             if not getattr(self.production, name):

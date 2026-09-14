@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from signal import Signals
 
-from godzilla.config.models import SystemState
+from godzilla.config.modes import SystemState
 from godzilla.core.clock import Clock
 from godzilla.core.ids import EventId
 

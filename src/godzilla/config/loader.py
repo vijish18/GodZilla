@@ -10,7 +10,8 @@ from typing import Any
 
 import yaml
 
-from godzilla.config.models import Settings, TradingMode
+from godzilla.config.models import Settings
+from godzilla.config.modes import TradingMode
 
 
 class ConfigLoadError(RuntimeError):

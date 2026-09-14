@@ -1,10 +1,38 @@
 compliance:
-  profile_version: null
-  broker_name: null
-  verified_at_utc: null
-  client_api_approved: false
+  profile_id: india-nse-local-paper
+  version: "2026-09-15-v1"
+  jurisdiction: INDIA
+  exchange: NSE
+  broker_name: LOCAL_PAPER_SIMULATOR
+  broker_route: PAPER_SIMULATOR
+  static_ip_required: false
   static_ip_registered: false
-  order_types_verified: false
-  short_route_verified: false
-  session_logout_verified: false
-  rate_limits_verified: false
+  api_tagging:
+    required: false
+    scheme: null
+    verified: true
+  rate_limit:
+    exchange_threshold_ops: 10
+    configured_max_ops: 10
+    verified: true
+  allowed_order_types: [LIMIT, STOP_LIMIT]
+  short_eligibility:
+    intraday_short_allowed: true
+    require_fo_eligibility: true
+    broker_permission_verified: true
+    overnight_short_allowed: false
+  api_daily_session_reset_required: false
+  api_daily_session_reset_verified: true
+  effective_from: 2026-04-01
+  effective_to: 2026-12-31
+  source_references:
+    - authority: SEBI
+      reference: SEBI/HO/MIRSD/MIRSD-PoD/P/CIR/2025/132
+      url: https://www.sebi.gov.in/sebi_data/attachdocs/sep-2025/1759232056254.pdf
+    - authority: NSE
+      reference: Retail Algo FAQ dated 2025-11-03
+      url: https://nsearchives.nseindia.com/web/sites/default/files/inline-files/FAQ_Retail%20Algo_03112025_NSE.pdf
+  reviewed_at: 2026-09-15T00:00:00Z
+  expires_at: 2026-10-15T00:00:00Z
+  paper_allowed: true
+  live_allowed: false
