@@ -16,6 +16,7 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, Settings
 from godzilla.alphas.breakout_models import BreakoutSettings
 from godzilla.alphas.momentum_models import MomentumSettings
 from godzilla.alphas.pairs_models import PairsSettings
+from godzilla.alphas.vwap_models import VwapSettings
 from godzilla.compliance.models import ComplianceProfile
 from godzilla.config.modes import SystemState, TradingMode
 from godzilla.market_data.quality import DataQualitySettings
@@ -172,6 +173,7 @@ class Settings(BaseSettings):
     momentum: MomentumSettings = MomentumSettings()
     breakout: BreakoutSettings = BreakoutSettings()
     pairs: PairsSettings = PairsSettings()
+    vwap_reversion: VwapSettings = VwapSettings()
     secrets: SecretSettings = SecretSettings()
 
     @field_validator("mode", mode="before")
@@ -199,6 +201,8 @@ class Settings(BaseSettings):
         missing = list(self.compliance.structural_issues(self.mode))
         if self.alphas.pairs_stat_arb is AlphaAvailability.ENABLED:
             missing.append("pairs_stat_arb must remain research-only in Phase 9")
+        if self.alphas.vwap_mean_reversion is AlphaAvailability.ENABLED:
+            missing.append("vwap_mean_reversion requires independent backtest promotion")
         missing.extend(self.secrets.missing_live_requirements())
         for name in ("deployment_approved", "live_trading_enabled", "leader_election_configured"):
             if not getattr(self.production, name):

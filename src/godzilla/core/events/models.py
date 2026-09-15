@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from godzilla.alphas.breakout_models import BreakoutSignalEvidence
 from godzilla.alphas.momentum_models import MomentumSignalEvidence
 from godzilla.alphas.pairs_models import PairSignalIntent
+from godzilla.alphas.vwap_models import VwapSignalEvidence
 from godzilla.config.modes import SystemState, TradingMode
 from godzilla.features.models import FeatureSetVersion, FeatureSnapshot
 from godzilla.market_data.models import Bar, Quote, utc
@@ -99,7 +100,7 @@ class SignalIntent(FrozenModel):
     side: Literal["LONG", "SHORT"]
     reasons: tuple[str, ...]
     score: float | None = Field(default=None, ge=0, le=1)
-    evidence: MomentumSignalEvidence | BreakoutSignalEvidence | None = None
+    evidence: MomentumSignalEvidence | BreakoutSignalEvidence | VwapSignalEvidence | None = None
 
     @model_validator(mode="after")
     def consistent_momentum(self) -> SignalIntent:

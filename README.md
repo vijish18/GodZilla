@@ -16,6 +16,12 @@ an execution plan can reach a broker adapter. Risk-critical uncertainty fails cl
 
 ## Current capabilities
 
+Phase 10 adds CHOP-only VWAP mean-reversion research with versioned session features,
+mandatory impulse deceleration and closed-bar reversal, symmetric intents and exit metadata.
+LIVE remains blocked pending independent backtest promotion. See the
+[Phase 10 contract](docs/phase-10-vwap-reversion.md) and
+[ADR-0010](docs/adr/ADR-0010-vwap-reversion.md).
+
 Phase 9 adds a research-first pairs engine with training-only OLS, statistical diagnostics,
 causal spread scores, two-leg intents and cost/survival reporting. Pairs are unconditionally
 disabled in LIVE. See [the pairs contract](docs/phase-9-pairs.md) and

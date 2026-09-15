@@ -1,4 +1,32 @@
 mode: PAPER
+
+# Phase 10 research/paper starting hypotheses; no optimization or LIVE promotion.
+vwap_reversion:
+  version: vwap-reversion-research-v1
+  enabled: true
+  live_enabled: false
+  research_regime_override: false
+  features:
+    revision: vwap-reversion-features-v1
+    scale_bars: 12
+  min_stretch: 2
+  max_stretch: 6
+  min_impulse: 0.5
+  max_deceleration_ratio: 0.7
+  min_reversal: 0.1
+  min_body: 0.05
+  min_close_location: 0.65
+  start_minutes: 75
+  end_minutes: 300
+  max_hold_minutes: 30
+  convergence_fraction: 0.8
+  adverse_scale: 1
+  max_spread_bps: 12
+  max_quote_age_seconds: 3
+  max_bar_lag_seconds: 30
+  liquidity_max_age_seconds: 86400
+  min_adv: 100000
+  min_turnover: 10000000
 pairs:
   # Research-only engineering hypotheses; LIVE has no enablement path in Phase 9.
   version: pairs-research-v1

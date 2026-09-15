@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "godzilla-quant"
-version = "0.9.0"
+version = "0.10.0"
 description = "Fail-closed operational metadata foundation for Project GodZilla"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
