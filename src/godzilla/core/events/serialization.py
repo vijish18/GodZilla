@@ -3,7 +3,12 @@
 import hashlib
 import json
 
-from godzilla.core.events.models import EventEnvelope, FeatureUpdate, MarketStateUpdate
+from godzilla.core.events.models import (
+    EventEnvelope,
+    FeatureUpdate,
+    MarketStateUpdate,
+    SignalIntent,
+)
 
 
 def serialize_event(event: EventEnvelope) -> str:
@@ -14,6 +19,9 @@ def serialize_event(event: EventEnvelope) -> str:
         payload["payload"].pop("definition", None)
     if isinstance(event.payload, MarketStateUpdate) and event.payload.decision is None:
         payload["payload"].pop("decision", None)
+    if isinstance(event.payload, SignalIntent) and event.payload.evidence is None:
+        payload["payload"].pop("score", None)
+        payload["payload"].pop("evidence", None)
     return json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
 

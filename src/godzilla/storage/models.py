@@ -153,6 +153,22 @@ class MarketStateRow(Base):
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
 
 
+class AlphaSignalRow(Base):
+    __tablename__ = "alpha_signals"
+    __table_args__ = (
+        UniqueConstraint("alpha_id", "symbol", "timestamp", name="uq_alpha_symbol_time"),
+    )
+    signal_id: Mapped[UUID] = mapped_column(primary_key=True)
+    event_id: Mapped[UUID] = mapped_column(ForeignKey("audit_events.event_id"), unique=True)
+    alpha_id: Mapped[str] = mapped_column(Text)
+    instrument_id: Mapped[str] = mapped_column(Text)
+    symbol: Mapped[str] = mapped_column(Text)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    side: Mapped[str] = mapped_column(Text)
+    score: Mapped[float]
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
 class FeatureSnapshotRow(Base):
     __tablename__ = "feature_snapshots"
     snapshot_hash: Mapped[str] = mapped_column(String(64), primary_key=True)

@@ -9,6 +9,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from godzilla.alphas.momentum_models import ALPHA_ID, MomentumSignalEvidence
 from godzilla.config.modes import SystemState, TradingMode
 from godzilla.features.models import FeatureSetVersion, FeatureSnapshot
 from godzilla.market_data.models import Bar, Quote, utc
@@ -95,6 +96,21 @@ class SignalIntent(FrozenModel):
     alpha_id: str
     side: Literal["LONG", "SHORT"]
     reasons: tuple[str, ...]
+    score: float | None = Field(default=None, ge=0, le=1)
+    evidence: MomentumSignalEvidence | None = None
+
+    @model_validator(mode="after")
+    def consistent_momentum(self) -> SignalIntent:
+        if (self.score is None) != (self.evidence is None):
+            raise ValueError("scored intent requires evidence")
+        if self.evidence and (
+            self.alpha_id != ALPHA_ID
+            or self.side != self.evidence.side
+            or self.instrument_id != self.evidence.ranked.instrument_id
+            or self.score != self.evidence.score
+        ):
+            raise ValueError("intent differs from momentum evidence")
+        return self
 
 
 class Decision(FrozenModel):
@@ -198,6 +214,9 @@ class EventEnvelope(FrozenModel):
         elif isinstance(self.payload, MarketStateUpdate) and self.payload.decision is not None:
             if self.payload.decision.timestamp != self.occurred_at:
                 raise ValueError("market-state event time disagrees with decision")
+        elif isinstance(self.payload, SignalIntent) and self.payload.evidence is not None:
+            if self.payload.evidence.timestamp != self.occurred_at:
+                raise ValueError("signal time disagrees with evidence")
         if observation is not None and (
             event_time != self.occurred_at or observation.received_at > self.received_at
         ):

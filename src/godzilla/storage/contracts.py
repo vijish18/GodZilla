@@ -1,8 +1,9 @@
 """Domain-facing repository ports; no ORM types cross this boundary."""
 
 from typing import Protocol
+from uuid import UUID
 
-from godzilla.core.events.models import EventEnvelope, SystemStateSnapshot
+from godzilla.core.events.models import EventEnvelope, SignalIntent, SystemStateSnapshot
 from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
 from godzilla.market_state.models import StateDecision
@@ -34,3 +35,7 @@ class FeatureRepository(Protocol):
 
 class MarketStateRepository(Protocol):
     def get_market_state(self, decision_hash: str) -> StateDecision | None: ...
+
+
+class AlphaSignalRepository(Protocol):
+    def get_alpha_signal(self, signal_id: UUID) -> SignalIntent | None: ...

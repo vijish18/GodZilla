@@ -1,4 +1,26 @@
 mode: PAPER
+momentum:
+  # Unoptimized research/paper hypotheses. Scores never determine position quantity.
+  version: momentum-research-v1
+  formula_revision: "1"
+  enabled: true
+  exclude_recent_5m: false
+  weights:
+    return_30m: 0.20
+    return_60m: 0.20
+    return_120m: 0.20
+    relative_sector_30m: 0.15
+    relative_market_30m: 0.15
+    trend_quality: 0.05
+    liquidity_quality: 0.05
+  long_tail_fraction: 0.20
+  short_tail_fraction: 0.20
+  max_candidates_per_side: 5
+  minimum_universe_size: 10
+  max_spread_bps: 12
+  max_quote_age_seconds: 3
+  min_adv: 100000
+  min_daily_turnover: 10000000
 market_state:
   # Unoptimized research/paper hypotheses; not production-calibrated thresholds.
   version: market-state-research-v1

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from uuid import UUID
 
 from sqlalchemy import Engine, create_engine, or_, select, text
 from sqlalchemy.orm import Session
@@ -12,6 +13,7 @@ from godzilla.core.events.models import (
     FeatureUpdate,
     MarketStateUpdate,
     QuoteUpdate,
+    SignalIntent,
     SystemStateSnapshot,
 )
 from godzilla.core.events.serialization import event_hash
@@ -19,6 +21,7 @@ from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
 from godzilla.market_state.models import StateDecision
 from godzilla.storage.models import (
+    AlphaSignalRow,
     AuditEventRow,
     Bar1mRow,
     Bar5mRow,
@@ -130,6 +133,21 @@ class PostgresRepository:
 
     @staticmethod
     def _project(session: Session, event: EventEnvelope) -> None:
+        if isinstance(event.payload, SignalIntent) and event.payload.evidence is not None:
+            intent = event.payload
+            session.add(
+                AlphaSignalRow(
+                    signal_id=intent.signal_id,
+                    event_id=event.event_id,
+                    alpha_id=intent.alpha_id,
+                    instrument_id=intent.instrument_id,
+                    symbol=event.payload.evidence.ranked.symbol,
+                    timestamp=event.occurred_at,
+                    side=intent.side,
+                    score=intent.score,
+                    payload=intent.model_dump(mode="json"),
+                )
+            )
         if isinstance(event.payload, MarketStateUpdate) and event.payload.decision is not None:
             decision = event.payload.decision
             session.add(
@@ -297,3 +315,15 @@ class PostgresRepository:
             if decision.decision_hash() != decision_hash:
                 raise ValueError("market-state snapshot integrity failure")
             return decision
+
+    def get_alpha_signal(self, signal_id: UUID) -> SignalIntent | None:
+        with Session(self.engine) as session:
+            row = session.get(AlphaSignalRow, signal_id)
+            if row is None:
+                return None
+            intent = SignalIntent.model_validate(row.payload)
+            events = self.read_events()
+            original = next((e.payload for e in events if e.event_id == row.event_id), None)
+            if original != intent:
+                raise ValueError("alpha signal integrity failure")
+            return intent

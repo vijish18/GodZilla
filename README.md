@@ -102,6 +102,12 @@ Phase 5 implements versioned causal stock, market, sector, liquidity and pair fe
 snapshots with shared batch/incremental computation and atomic PostgreSQL persistence.
 Phase 6 adds a deterministic market-state router with versioned evidence, confirmation,
 health vetoes, conservative alpha permissions, audit history and a VWAP+slope baseline
-comparison. No alpha or trading logic is implemented.
+comparison.
 See [Phase 6 contract](docs/phase-6-market-state.md) and
-[ADR-0006](docs/adr/ADR-0006-deterministic-market-state.md). Phase 7 has not started.
+[ADR-0006](docs/adr/ADR-0006-deterministic-market-state.md).
+
+Phase 7 adds Alpha A: causal cross-sectional momentum scores, guarded LONG/SHORT
+SignalIntents, persisted score evidence and label-isolated quantile diagnostics.
+See [Phase 7 contract](docs/phase-7-momentum.md) and
+[ADR-0007](docs/adr/ADR-0007-cross-sectional-momentum.md). No sizing or orders are implemented.
+Phase 8 has not started.
