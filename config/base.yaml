@@ -1,4 +1,41 @@
 mode: PAPER
+breakout:
+  # Architecture weights are unoptimized research/paper hypotheses.
+  version: breakout-research-v1
+  formula_revision: "1"
+  enabled: true
+  weights:
+    relative_strength: 0.25
+    breakout_quality: 0.20
+    relative_volume: 0.15
+    sector_confirmation: 0.15
+    slope_quality: 0.10
+    reward_risk_proxy: 0.10
+    liquidity_quality: 0.05
+  range_source: either
+  minimum_universe_size: 10
+  minimum_strength_percentile: 0.8
+  minimum_residual_return: 0.002
+  minimum_relative_volume: 1.5
+  full_relative_volume: 3
+  min_extension_atr: 0.05
+  full_extension_atr: 0.25
+  max_extension_atr: 0.75
+  min_close_location: 0.7
+  min_body_fraction: 0.2
+  full_sector_distance: 0.005
+  full_slope: 0.001
+  invalidation_buffer_atr: 0.1
+  observation_bars: 3
+  reward_distance_atr: 2
+  min_reward_risk_proxy: 1.5
+  full_reward_risk_proxy: 3
+  max_spread_bps: 12
+  max_quote_age_seconds: 3
+  min_adv: 100000
+  min_daily_turnover: 10000000
+  max_bar_lag_seconds: 30
+  minimum_score: 0.6
 momentum:
   # Unoptimized research/paper hypotheses. Scores never determine position quantity.
   version: momentum-research-v1

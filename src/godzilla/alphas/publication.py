@@ -17,7 +17,7 @@ def publish_intent(
     emit: Callable[[EventEnvelope], None] | None = None,
 ) -> bool:
     if intent.evidence is None:
-        raise ValueError("momentum publication requires scored evidence")
+        raise ValueError("alpha publication requires scored evidence")
     evidence = intent.evidence
     event = EventEnvelope(
         event_id=uuid5(NAMESPACE_URL, "godzilla:signal-event:" + str(intent.signal_id)),

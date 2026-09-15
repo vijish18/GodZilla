@@ -110,4 +110,7 @@ Phase 7 adds Alpha A: causal cross-sectional momentum scores, guarded LONG/SHORT
 SignalIntents, persisted score evidence and label-isolated quantile diagnostics.
 See [Phase 7 contract](docs/phase-7-momentum.md) and
 [ADR-0007](docs/adr/ADR-0007-cross-sectional-momentum.md). No sizing or orders are implemented.
-Phase 8 has not started.
+Phase 8 adds Alpha B: closed-bar momentum breakouts, configurable score components,
+known-level causality checks and failed-breakout observation metadata.
+See [Phase 8 contract](docs/phase-8-breakout.md) and
+[ADR-0008](docs/adr/ADR-0008-momentum-breakout.md). Phase 9 has not started.

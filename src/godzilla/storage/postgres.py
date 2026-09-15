@@ -141,7 +141,7 @@ class PostgresRepository:
                     event_id=event.event_id,
                     alpha_id=intent.alpha_id,
                     instrument_id=intent.instrument_id,
-                    symbol=event.payload.evidence.ranked.symbol,
+                    symbol=event.payload.evidence.symbol,
                     timestamp=event.occurred_at,
                     side=intent.side,
                     score=intent.score,

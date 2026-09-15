@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, SecretStr, field_validator, model_validat
 from pydantic_core import to_jsonable_python
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
+from godzilla.alphas.breakout_models import BreakoutSettings
 from godzilla.alphas.momentum_models import MomentumSettings
 from godzilla.compliance.models import ComplianceProfile
 from godzilla.config.modes import SystemState, TradingMode
@@ -168,6 +169,7 @@ class Settings(BaseSettings):
     data_quality: DataQualitySettings = DataQualitySettings()
     market_state: RouterSettings = RouterSettings()
     momentum: MomentumSettings = MomentumSettings()
+    breakout: BreakoutSettings = BreakoutSettings()
     secrets: SecretSettings = SecretSettings()
 
     @field_validator("mode", mode="before")

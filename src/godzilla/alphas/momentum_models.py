@@ -97,6 +97,18 @@ class MomentumSignalEvidence(FeatureModel):
 
     _aware = field_validator("timestamp")(utc)
 
+    @property
+    def alpha_id(self) -> str:
+        return ALPHA_ID
+
+    @property
+    def instrument_id(self) -> str:
+        return self.ranked.instrument_id
+
+    @property
+    def symbol(self) -> str:
+        return self.ranked.symbol
+
     @model_validator(mode="after")
     def consistent(self) -> "MomentumSignalEvidence":
         expected = self.ranked.long_score if self.side == "LONG" else self.ranked.short_score
