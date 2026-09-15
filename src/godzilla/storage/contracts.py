@@ -3,6 +3,7 @@
 from typing import Protocol
 from uuid import UUID
 
+from godzilla.alphas.pairs_models import PairSignalIntent
 from godzilla.core.events.models import EventEnvelope, SignalIntent, SystemStateSnapshot
 from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
@@ -38,4 +39,4 @@ class MarketStateRepository(Protocol):
 
 
 class AlphaSignalRepository(Protocol):
-    def get_alpha_signal(self, signal_id: UUID) -> SignalIntent | None: ...
+    def get_alpha_signal(self, signal_id: UUID) -> SignalIntent | PairSignalIntent | None: ...

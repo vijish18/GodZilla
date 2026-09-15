@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy import Engine, create_engine, or_, select, text
 from sqlalchemy.orm import Session
 
+from godzilla.alphas.pairs_models import PairSignalIntent
 from godzilla.core.events.models import (
     BarClose,
     EventEnvelope,
@@ -133,6 +134,21 @@ class PostgresRepository:
 
     @staticmethod
     def _project(session: Session, event: EventEnvelope) -> None:
+        if isinstance(event.payload, PairSignalIntent):
+            pair = event.payload
+            session.add(
+                AlphaSignalRow(
+                    signal_id=pair.signal_id,
+                    event_id=event.event_id,
+                    alpha_id=pair.alpha_id,
+                    instrument_id=pair.pair_id,
+                    symbol="PAIR:" + pair.pair_id,
+                    timestamp=pair.timestamp,
+                    side=pair.direction,
+                    score=min(1, abs(pair.risk_reference.current_z) / pair.settings.stop_z),
+                    payload=pair.model_dump(mode="json"),
+                )
+            )
         if isinstance(event.payload, SignalIntent) and event.payload.evidence is not None:
             intent = event.payload
             session.add(
@@ -316,12 +332,16 @@ class PostgresRepository:
                 raise ValueError("market-state snapshot integrity failure")
             return decision
 
-    def get_alpha_signal(self, signal_id: UUID) -> SignalIntent | None:
+    def get_alpha_signal(self, signal_id: UUID) -> SignalIntent | PairSignalIntent | None:
         with Session(self.engine) as session:
             row = session.get(AlphaSignalRow, signal_id)
             if row is None:
                 return None
-            intent = SignalIntent.model_validate(row.payload)
+            intent: SignalIntent | PairSignalIntent = (
+                PairSignalIntent.model_validate(row.payload)
+                if row.payload.get("kind") == "PAIR_SIGNAL_INTENT"
+                else SignalIntent.model_validate(row.payload)
+            )
             events = self.read_events()
             original = next((e.payload for e in events if e.event_id == row.event_id), None)
             if original != intent:

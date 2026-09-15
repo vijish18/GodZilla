@@ -16,6 +16,11 @@ an execution plan can reach a broker adapter. Risk-critical uncertainty fails cl
 
 ## Current capabilities
 
+Phase 9 adds a research-first pairs engine with training-only OLS, statistical diagnostics,
+causal spread scores, two-leg intents and cost/survival reporting. Pairs are unconditionally
+disabled in LIVE. See [the pairs contract](docs/phase-9-pairs.md) and
+[ADR-0009](docs/adr/ADR-0009-pairs-research.md).
+
 - Python 3.12 package using a `src` layout.
 - Typed Pydantic v2 configuration with base, mode, compliance, and environment layers.
 - PAPER is the default. LIVE configuration fails until deployment, leadership, compliance,

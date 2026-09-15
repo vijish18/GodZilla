@@ -1,4 +1,33 @@
 mode: PAPER
+pairs:
+  # Research-only engineering hypotheses; LIVE has no enablement path in Phase 9.
+  version: pairs-research-v1
+  formula_revision: "1"
+  enabled: true
+  live_enabled: false
+  training_bars: 250
+  test_lags: 1
+  significance: 0.05
+  min_beta: 0.5
+  max_beta: 2
+  max_beta_drift: 0.25
+  min_spread_std: 0.00001
+  max_spread_std_ratio: 3
+  max_spread_mean_shift: 1.5
+  min_half_life_bars: 0.5
+  max_half_life_bars: 30
+  entry_z: 2
+  exit_z: 0.5
+  stop_z: 4
+  max_hold_minutes: 60
+  max_net_gross_fraction: 0.2
+  max_spread_bps: 12
+  quote_max_age_seconds: 3
+  max_bar_lag_seconds: 30
+  min_adv: 100000
+  min_turnover: 10000000
+  liquidity_metadata_max_age_seconds: 86400
+  max_leg_lag_seconds: 3
 breakout:
   # Architecture weights are unoptimized research/paper hypotheses.
   version: breakout-research-v1
