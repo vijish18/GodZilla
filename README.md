@@ -16,6 +16,11 @@ an execution plan can reach a broker adapter. Risk-critical uncertainty fails cl
 
 ## Current capabilities
 
+Phase 11 adds research sector leader/laggard pairs and baskets with training-only NIFTY beta
+estimates, net/beta exposure limits and stable-security inventory overlap checks. LIVE remains
+blocked pending independent validation. See the [Phase 11 contract](docs/phase-11-relative-value.md)
+and [ADR-0011](docs/adr/ADR-0011-relative-value.md).
+
 Phase 10 adds CHOP-only VWAP mean-reversion research with versioned session features,
 mandatory impulse deceleration and closed-bar reversal, symmetric intents and exit metadata.
 LIVE remains blocked pending independent backtest promotion. See the

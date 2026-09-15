@@ -13,7 +13,7 @@ CONFIG_DIR = Path(__file__).parents[2] / "config"
 
 def test_version_command(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["version"]) == 0
-    assert capsys.readouterr().out.strip() == "0.10.0"
+    assert capsys.readouterr().out.strip() == "0.11.0"
 
 
 def test_config_check_reports_mode_and_hash(capsys: pytest.CaptureFixture[str]) -> None:

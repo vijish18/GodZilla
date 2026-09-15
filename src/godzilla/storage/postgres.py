@@ -8,6 +8,7 @@ from sqlalchemy import Engine, create_engine, or_, select, text
 from sqlalchemy.orm import Session
 
 from godzilla.alphas.pairs_models import PairSignalIntent
+from godzilla.alphas.relative_value_models import RelativeValueIntent
 from godzilla.core.events.models import (
     BarClose,
     EventEnvelope,
@@ -134,6 +135,21 @@ class PostgresRepository:
 
     @staticmethod
     def _project(session: Session, event: EventEnvelope) -> None:
+        if isinstance(event.payload, RelativeValueIntent):
+            rv = event.payload
+            session.add(
+                AlphaSignalRow(
+                    signal_id=rv.signal_id,
+                    event_id=event.event_id,
+                    alpha_id=rv.alpha_id,
+                    instrument_id=str(rv.entity_id),
+                    symbol="RV:" + str(rv.entity_id),
+                    timestamp=rv.timestamp,
+                    side="LONG_SHORT",
+                    score=rv.score,
+                    payload=rv.model_dump(mode="json"),
+                )
+            )
         if isinstance(event.payload, PairSignalIntent):
             pair = event.payload
             session.add(
@@ -332,13 +348,17 @@ class PostgresRepository:
                 raise ValueError("market-state snapshot integrity failure")
             return decision
 
-    def get_alpha_signal(self, signal_id: UUID) -> SignalIntent | PairSignalIntent | None:
+    def get_alpha_signal(
+        self, signal_id: UUID
+    ) -> SignalIntent | PairSignalIntent | RelativeValueIntent | None:
         with Session(self.engine) as session:
             row = session.get(AlphaSignalRow, signal_id)
             if row is None:
                 return None
-            intent: SignalIntent | PairSignalIntent = (
-                PairSignalIntent.model_validate(row.payload)
+            intent: SignalIntent | PairSignalIntent | RelativeValueIntent = (
+                RelativeValueIntent.model_validate(row.payload)
+                if row.payload.get("kind") == "RELATIVE_VALUE_INTENT"
+                else PairSignalIntent.model_validate(row.payload)
                 if row.payload.get("kind") == "PAIR_SIGNAL_INTENT"
                 else SignalIntent.model_validate(row.payload)
             )

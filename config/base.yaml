@@ -1,5 +1,29 @@
 mode: PAPER
 
+# Phase 11 research/paper hypotheses; no independent validation or LIVE promotion.
+relative_value:
+  version: sector-rv-research-v1
+  enabled: true
+  live_enabled: false
+  construction: PAIR
+  members_per_side: 2
+  minimum_sector_size: 4
+  tail_fraction: 0.25
+  sector_residual_weight: 0.5
+  min_residual_gap: 0.002
+  training_returns: 24
+  min_beta: 0.2
+  max_beta: 3
+  max_split_beta_drift: 0.5
+  max_net_gross: 0.15
+  max_beta_gross: 0.02
+  max_inventory_age_seconds: 30
+  max_spread_bps: 12
+  max_quote_age_seconds: 3
+  min_adv: 100000
+  min_turnover: 10000000
+  max_leg_lag_seconds: 3
+
 # Phase 10 research/paper starting hypotheses; no optimization or LIVE promotion.
 vwap_reversion:
   version: vwap-reversion-research-v1

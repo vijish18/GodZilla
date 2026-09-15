@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from godzilla.alphas.breakout_models import BreakoutSignalEvidence
 from godzilla.alphas.momentum_models import MomentumSignalEvidence
 from godzilla.alphas.pairs_models import PairSignalIntent
+from godzilla.alphas.relative_value_models import RelativeValueIntent
 from godzilla.alphas.vwap_models import VwapSignalEvidence
 from godzilla.config.modes import SystemState, TradingMode
 from godzilla.features.models import FeatureSetVersion, FeatureSnapshot
@@ -178,6 +179,7 @@ Payload = Annotated[
     | MarketStateUpdate
     | SignalIntent
     | PairSignalIntent
+    | RelativeValueIntent
     | Decision
     | OrderEvent
     | Fill
@@ -222,7 +224,7 @@ class EventEnvelope(FrozenModel):
             if self.payload.evidence.timestamp != self.occurred_at:
                 raise ValueError("signal time disagrees with evidence")
         elif (
-            isinstance(self.payload, PairSignalIntent)
+            isinstance(self.payload, PairSignalIntent | RelativeValueIntent)
             and self.payload.timestamp != self.occurred_at
         ):
             raise ValueError("pair intent time disagrees with envelope")
