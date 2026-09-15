@@ -1,3 +1,5 @@
+import hashlib
+import json
 from datetime import datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
@@ -19,6 +21,20 @@ from godzilla.core.health import SystemHealth
 from godzilla.storage.postgres import make_engine
 
 pytestmark = pytest.mark.unit
+
+
+def test_legacy_feature_event_keeps_its_original_hash(event):
+    raw = event.model_dump(mode="json")
+    raw["payload"] = {
+        "kind": "FEATURE_UPDATE",
+        "entity": "DEMO",
+        "feature_version": "v1",
+        "values": [{"name": "x", "value": "1.25"}],
+    }
+    original = json.dumps(raw, sort_keys=True, separators=(",", ":"))
+    restored = deserialize_event(original)
+    assert serialize_event(restored) == original
+    assert event_hash(restored) == hashlib.sha256(original.encode()).hexdigest()
 
 
 def test_event_serialization_is_lossless_and_frozen(event):

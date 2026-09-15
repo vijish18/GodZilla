@@ -10,6 +10,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from godzilla.config.modes import SystemState, TradingMode
+from godzilla.features.models import FeatureSetVersion, FeatureSnapshot
 from godzilla.market_data.models import Bar, Quote, utc
 
 
@@ -44,6 +45,30 @@ class FeatureUpdate(FrozenModel):
     entity: str
     feature_version: str
     values: tuple[NamedValue, ...]
+    snapshot: FeatureSnapshot | None = None
+    definition: FeatureSetVersion | None = None
+
+    @model_validator(mode="after")
+    def feature_identity(self) -> FeatureUpdate:
+        if (self.snapshot is None) != (self.definition is None):
+            raise ValueError("feature snapshot and definition must be supplied together")
+        if (
+            self.snapshot is not None
+            and self.definition is not None
+            and (
+                self.feature_version != self.definition.version_hash()
+                or self.snapshot.feature_set_hash != self.feature_version
+                or self.snapshot.entity != self.entity
+            )
+        ):
+            raise ValueError("feature version or entity mismatch")
+        if self.snapshot is not None and self.values != tuple(
+            NamedValue(name=item.name, value=Decimal(str(item.value)))
+            for item in self.snapshot.values
+            if item.value is not None
+        ):
+            raise ValueError("feature values disagree with snapshot")
+        return self
 
 
 class MarketStateUpdate(FrozenModel):
@@ -156,6 +181,9 @@ class EventEnvelope(FrozenModel):
         elif isinstance(self.payload, QuoteUpdate):
             observation = self.payload.quote
             event_time = observation.timestamp
+        elif isinstance(self.payload, FeatureUpdate) and self.payload.snapshot is not None:
+            if self.payload.snapshot.timestamp != self.occurred_at:
+                raise ValueError("feature event time disagrees with snapshot")
         if observation is not None and (
             event_time != self.occurred_at or observation.received_at > self.received_at
         ):

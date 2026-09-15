@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "godzilla-quant"
-version = "0.4.0"
+version = "0.5.0"
 description = "Fail-closed operational metadata foundation for Project GodZilla"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -27,6 +27,7 @@ dev = [
   "pytest-cov>=5,<7",
   "ruff>=0.7,<1",
   "types-PyYAML>=6.0.12,<7",
+  "hypothesis>=6,<7",
 ]
 
 [project.scripts]

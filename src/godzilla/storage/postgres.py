@@ -6,13 +6,22 @@ import json
 from sqlalchemy import Engine, create_engine, or_, select, text
 from sqlalchemy.orm import Session
 
-from godzilla.core.events.models import BarClose, EventEnvelope, QuoteUpdate, SystemStateSnapshot
+from godzilla.core.events.models import (
+    BarClose,
+    EventEnvelope,
+    FeatureUpdate,
+    QuoteUpdate,
+    SystemStateSnapshot,
+)
 from godzilla.core.events.serialization import event_hash
+from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
 from godzilla.storage.models import (
     AuditEventRow,
     Bar1mRow,
     Bar5mRow,
+    FeatureSnapshotRow,
+    FeatureVersionRow,
     InstrumentRow,
     InstrumentVersionRow,
     ProvenanceVersionRow,
@@ -118,6 +127,30 @@ class PostgresRepository:
 
     @staticmethod
     def _project(session: Session, event: EventEnvelope) -> None:
+        if isinstance(event.payload, FeatureUpdate) and event.payload.snapshot is not None:
+            snapshot, definition = event.payload.snapshot, event.payload.definition
+            if definition is None:
+                raise ValueError("missing feature definition")
+            if session.get(FeatureVersionRow, snapshot.feature_set_hash) is None:
+                session.add(
+                    FeatureVersionRow(
+                        version_hash=snapshot.feature_set_hash,
+                        name=definition.name,
+                        definition=definition.model_dump(mode="json"),
+                    )
+                )
+                session.flush()
+            session.add(
+                FeatureSnapshotRow(
+                    snapshot_hash=snapshot.snapshot_hash(),
+                    event_id=event.event_id,
+                    feature_set_hash=snapshot.feature_set_hash,
+                    entity=snapshot.entity,
+                    timestamp=snapshot.timestamp,
+                    input_hash=snapshot.input_hash,
+                    payload=snapshot.model_dump(mode="json"),
+                )
+            )
         if isinstance(event.payload, BarClose):
             bar = event.payload.bar
             model = Bar1mRow if bar.interval_minutes == 1 else Bar5mRow
@@ -229,3 +262,13 @@ class PostgresRepository:
             if _hash(row.payload) != row.content_hash:
                 raise ValueError("instrument snapshot integrity failure")
             return InstrumentMasterSnapshot.model_validate(row.payload)
+
+    def get_feature_snapshot(self, snapshot_hash: str) -> FeatureSnapshot | None:
+        with Session(self.engine) as session:
+            row = session.get(FeatureSnapshotRow, snapshot_hash)
+            if row is None:
+                return None
+            snapshot = FeatureSnapshot.model_validate(row.payload)
+            if snapshot.snapshot_hash() != snapshot_hash:
+                raise ValueError("feature snapshot integrity failure")
+            return snapshot

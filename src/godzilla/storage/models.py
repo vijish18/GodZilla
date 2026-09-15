@@ -134,3 +134,21 @@ class SystemStateRow(Base):
     last_event_id: Mapped[UUID] = mapped_column(ForeignKey("audit_events.event_id"))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
+class FeatureVersionRow(Base):
+    __tablename__ = "feature_set_versions"
+    version_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    definition: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
+class FeatureSnapshotRow(Base):
+    __tablename__ = "feature_snapshots"
+    snapshot_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    event_id: Mapped[UUID] = mapped_column(ForeignKey("audit_events.event_id"), unique=True)
+    feature_set_hash: Mapped[str] = mapped_column(ForeignKey("feature_set_versions.version_hash"))
+    entity: Mapped[str] = mapped_column(Text, index=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    input_hash: Mapped[str] = mapped_column(String(64))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)

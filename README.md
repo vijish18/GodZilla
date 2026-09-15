@@ -95,4 +95,9 @@ SIGTERM cause explicit STOPPING and STOPPED lifecycle transitions.
 - [`ADR-0004: durable events and replay`](docs/adr/ADR-0004-durable-events-and-replay.md)
 - [`Phase 4 database operations`](docs/phase-4-storage.md)
 
-Phase 4 is complete. Phase 5 has not started.
+- [`ADR-0005: causal features`](docs/adr/ADR-0005-causal-features.md)
+- [`Phase 5 formulas, warm-up and persistence`](docs/phase-5-features.md)
+
+Phase 5 implements versioned causal stock, market, sector, liquidity and pair feature
+snapshots with shared batch/incremental computation and atomic PostgreSQL persistence.
+No market-state classifier or trading logic is implemented. Phase 6 has not started.
