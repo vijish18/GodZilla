@@ -10,3 +10,22 @@ services:
     volumes:
       - ./config:/app/config:ro
       - ./data:/app/data:ro
+  postgres:
+    image: postgres:17-bookworm
+    profiles: [storage]
+    environment:
+      POSTGRES_USER: godzilla
+      POSTGRES_DB: godzilla
+      POSTGRES_PASSWORD: ${GODZILLA_POSTGRES_PASSWORD:?Set a local PostgreSQL password}
+    ports:
+      - "127.0.0.1:${GODZILLA_POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U godzilla -d godzilla"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+volumes:
+  postgres_data:

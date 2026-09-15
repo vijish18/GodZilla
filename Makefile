@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install lint format typecheck test coverage run config-check snapshot-check docker-build docker-up docker-down ci
+.PHONY: install lint format typecheck test test-postgres migrate coverage run config-check snapshot-check docker-build docker-up docker-down ci
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -13,6 +13,12 @@ format:
 
 typecheck:
 	$(PYTHON) -m mypy src
+
+test-postgres:
+	$(PYTHON) scripts/test_postgres.py
+
+migrate:
+	$(PYTHON) -m alembic upgrade head
 
 test:
 	$(PYTHON) -m pytest
@@ -42,4 +48,4 @@ ci:
 	$(PYTHON) -m ruff format --check .
 	$(PYTHON) -m ruff check .
 	$(PYTHON) -m mypy src
-	$(PYTHON) -m pytest --cov=godzilla --cov-report=term-missing --cov-fail-under=85
+	$(PYTHON) scripts/test_postgres.py

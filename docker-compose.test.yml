@@ -1,0 +1,17 @@
+# Isolated disposable database; scripts/test_postgres.py supplies a random password.
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: godzilla_test
+      POSTGRES_DB: godzilla_test
+      POSTGRES_PASSWORD: ${GODZILLA_TEST_POSTGRES_PASSWORD:?test runner supplies this}
+    ports:
+      - "127.0.0.1::5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U godzilla_test -d godzilla_test"]
+      interval: 1s
+      timeout: 3s
+      retries: 60

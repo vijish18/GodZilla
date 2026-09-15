@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "godzilla-quant"
-version = "0.3.0"
+version = "0.4.0"
 description = "Fail-closed operational metadata foundation for Project GodZilla"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -14,6 +14,9 @@ dependencies = [
   "pydantic>=2.9,<3",
   "pydantic-settings>=2.5,<3",
   "PyYAML>=6.0.2,<7",
+  "SQLAlchemy>=2.0,<2.1",
+  "alembic>=1.13,<2",
+  "psycopg[binary]>=3.2,<4",
   "tzdata>=2025.2; platform_system == 'Windows'",
 ]
 
@@ -29,6 +32,7 @@ dev = [
 [project.scripts]
 godzilla = "godzilla.app.cli:main"
 godzilla-replay = "godzilla.market_data.replay_cli:main"
+godzilla-event-replay = "godzilla.core.events.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -61,6 +65,7 @@ markers = [
   "replay: deterministic event replay tests",
   "property: property-based invariant tests",
   "chaos: controlled failure-injection tests",
+  "postgres: isolated local PostgreSQL integration and migration tests",
 ]
 
 [tool.coverage.run]

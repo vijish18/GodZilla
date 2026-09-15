@@ -1,8 +1,8 @@
 # Project GodZilla
 
 Project GodZilla is a production-oriented, scientific, multi-alpha intraday long/short
-quantitative trading platform for liquid NSE India instruments. Phases 1 through 3 supply the
-engineering foundation, operational metadata and causal market-data interfaces. They contain no
+quantitative trading platform for liquid NSE India instruments. Phases 1 through 4 supply the
+engineering foundation, operational metadata, causal market-data interfaces and durable events. They contain no
 broker connectivity,
 live market-data integration, order placement, trading logic, portfolio decisions, or executable
 risk decisions.
@@ -31,6 +31,8 @@ an execution plan can reach a broker adapter. Risk-critical uncertainty fails cl
   long/short universe snapshots with explicit exclusion reason codes.
 - Vendor-neutral historical/streaming data contracts, causal session-aligned five-minute bars,
   quality flags, quote freshness health, bounded reconnect control, and deterministic offline replay.
+- Frozen event envelopes, canonical serialization, PostgreSQL event/projection transactions,
+  idempotency, Alembic migrations, and receipt-ordered replay with a monotonic replay clock.
 
 The original risk and session settings in `config/base.yaml` come from Architecture v1.0.
 Phase 3 adds gap/volume screening thresholds as engineering assumptions. All are conservative
@@ -90,5 +92,7 @@ SIGTERM cause explicit STOPPING and STOPPED lifecycle transitions.
 - [`Phase 2 operational metadata`](docs/phase-2-operational-metadata.md)
 - [`ADR-0003: causal market data`](docs/adr/ADR-0003-causal-market-data.md)
 - [`Phase 3 data contracts and replay`](docs/phase-3-market-data.md)
+- [`ADR-0004: durable events and replay`](docs/adr/ADR-0004-durable-events-and-replay.md)
+- [`Phase 4 database operations`](docs/phase-4-storage.md)
 
-Phase 3 is complete. Phase 4 has not started.
+Phase 4 is complete. Phase 5 has not started.
