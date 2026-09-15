@@ -3,7 +3,7 @@
 import hashlib
 import json
 
-from godzilla.core.events.models import EventEnvelope, FeatureUpdate
+from godzilla.core.events.models import EventEnvelope, FeatureUpdate, MarketStateUpdate
 
 
 def serialize_event(event: EventEnvelope) -> str:
@@ -12,6 +12,8 @@ def serialize_event(event: EventEnvelope) -> str:
         # Preserve the canonical schema-1 representation and existing audit hashes.
         payload["payload"].pop("snapshot", None)
         payload["payload"].pop("definition", None)
+    if isinstance(event.payload, MarketStateUpdate) and event.payload.decision is None:
+        payload["payload"].pop("decision", None)
     return json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
 

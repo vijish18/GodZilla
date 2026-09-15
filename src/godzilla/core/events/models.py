@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from godzilla.config.modes import SystemState, TradingMode
 from godzilla.features.models import FeatureSetVersion, FeatureSnapshot
 from godzilla.market_data.models import Bar, Quote, utc
+from godzilla.market_state.models import StateDecision
 
 
 class FrozenModel(BaseModel):
@@ -75,6 +76,16 @@ class MarketStateUpdate(FrozenModel):
     kind: Literal["MARKET_STATE_UPDATE"] = "MARKET_STATE_UPDATE"
     state: str
     reasons: tuple[str, ...]
+    decision: StateDecision | None = None
+
+    @model_validator(mode="after")
+    def consistent_decision(self) -> MarketStateUpdate:
+        if self.decision is not None and (
+            self.state != self.decision.state.value
+            or self.reasons != self.decision.evidence.reasons
+        ):
+            raise ValueError("market-state event disagrees with decision")
+        return self
 
 
 class SignalIntent(FrozenModel):
@@ -184,6 +195,9 @@ class EventEnvelope(FrozenModel):
         elif isinstance(self.payload, FeatureUpdate) and self.payload.snapshot is not None:
             if self.payload.snapshot.timestamp != self.occurred_at:
                 raise ValueError("feature event time disagrees with snapshot")
+        elif isinstance(self.payload, MarketStateUpdate) and self.payload.decision is not None:
+            if self.payload.decision.timestamp != self.occurred_at:
+                raise ValueError("market-state event time disagrees with decision")
         if observation is not None and (
             event_time != self.occurred_at or observation.received_at > self.received_at
         ):

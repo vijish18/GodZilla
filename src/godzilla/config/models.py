@@ -16,6 +16,7 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, Settings
 from godzilla.compliance.models import ComplianceProfile
 from godzilla.config.modes import SystemState, TradingMode
 from godzilla.market_data.quality import DataQualitySettings
+from godzilla.market_state.models import RouterSettings
 
 __all__ = ["Settings", "SystemState", "TradingMode"]
 
@@ -164,6 +165,7 @@ class Settings(BaseSettings):
     production: ProductionSettings = ProductionSettings()
     compliance: ComplianceProfile
     data_quality: DataQualitySettings = DataQualitySettings()
+    market_state: RouterSettings = RouterSettings()
     secrets: SecretSettings = SecretSettings()
 
     @field_validator("mode", mode="before")

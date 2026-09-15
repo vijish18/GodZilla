@@ -5,6 +5,7 @@ from typing import Protocol
 from godzilla.core.events.models import EventEnvelope, SystemStateSnapshot
 from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
+from godzilla.market_state.models import StateDecision
 
 
 class EventRepository(Protocol):
@@ -29,3 +30,7 @@ class SystemStateRepository(Protocol):
 
 class FeatureRepository(Protocol):
     def get_feature_snapshot(self, snapshot_hash: str) -> FeatureSnapshot | None: ...
+
+
+class MarketStateRepository(Protocol):
+    def get_market_state(self, decision_hash: str) -> StateDecision | None: ...

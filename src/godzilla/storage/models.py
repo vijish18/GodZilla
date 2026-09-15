@@ -143,6 +143,16 @@ class FeatureVersionRow(Base):
     definition: Mapped[dict[str, Any]] = mapped_column(JSONB)
 
 
+class MarketStateRow(Base):
+    __tablename__ = "market_state_history"
+    decision_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    event_id: Mapped[UUID] = mapped_column(ForeignKey("audit_events.event_id"), unique=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    state: Mapped[str] = mapped_column(Text)
+    config_version: Mapped[str] = mapped_column(String(64))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
 class FeatureSnapshotRow(Base):
     __tablename__ = "feature_snapshots"
     snapshot_hash: Mapped[str] = mapped_column(String(64), primary_key=True)

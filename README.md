@@ -100,4 +100,8 @@ SIGTERM cause explicit STOPPING and STOPPED lifecycle transitions.
 
 Phase 5 implements versioned causal stock, market, sector, liquidity and pair feature
 snapshots with shared batch/incremental computation and atomic PostgreSQL persistence.
-No market-state classifier or trading logic is implemented. Phase 6 has not started.
+Phase 6 adds a deterministic market-state router with versioned evidence, confirmation,
+health vetoes, conservative alpha permissions, audit history and a VWAP+slope baseline
+comparison. No alpha or trading logic is implemented.
+See [Phase 6 contract](docs/phase-6-market-state.md) and
+[ADR-0006](docs/adr/ADR-0006-deterministic-market-state.md). Phase 7 has not started.

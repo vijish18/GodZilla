@@ -10,12 +10,14 @@ from godzilla.core.events.models import (
     BarClose,
     EventEnvelope,
     FeatureUpdate,
+    MarketStateUpdate,
     QuoteUpdate,
     SystemStateSnapshot,
 )
 from godzilla.core.events.serialization import event_hash
 from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
+from godzilla.market_state.models import StateDecision
 from godzilla.storage.models import (
     AuditEventRow,
     Bar1mRow,
@@ -24,6 +26,7 @@ from godzilla.storage.models import (
     FeatureVersionRow,
     InstrumentRow,
     InstrumentVersionRow,
+    MarketStateRow,
     ProvenanceVersionRow,
     QuoteRow,
     SystemStateRow,
@@ -127,6 +130,18 @@ class PostgresRepository:
 
     @staticmethod
     def _project(session: Session, event: EventEnvelope) -> None:
+        if isinstance(event.payload, MarketStateUpdate) and event.payload.decision is not None:
+            decision = event.payload.decision
+            session.add(
+                MarketStateRow(
+                    decision_hash=decision.decision_hash(),
+                    event_id=event.event_id,
+                    timestamp=decision.timestamp,
+                    state=decision.state.value,
+                    config_version=decision.evidence.router_version_hash,
+                    payload=decision.model_dump(mode="json"),
+                )
+            )
         if isinstance(event.payload, FeatureUpdate) and event.payload.snapshot is not None:
             snapshot, definition = event.payload.snapshot, event.payload.definition
             if definition is None:
@@ -272,3 +287,13 @@ class PostgresRepository:
             if snapshot.snapshot_hash() != snapshot_hash:
                 raise ValueError("feature snapshot integrity failure")
             return snapshot
+
+    def get_market_state(self, decision_hash: str) -> StateDecision | None:
+        with Session(self.engine) as session:
+            row = session.get(MarketStateRow, decision_hash)
+            if row is None:
+                return None
+            decision = StateDecision.model_validate(row.payload)
+            if decision.decision_hash() != decision_hash:
+                raise ValueError("market-state snapshot integrity failure")
+            return decision

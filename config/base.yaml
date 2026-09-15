@@ -1,4 +1,27 @@
 mode: PAPER
+market_state:
+  # Unoptimized research/paper hypotheses; not production-calibrated thresholds.
+  version: market-state-research-v1
+  formula_revision: "1"
+  vwap_distance: 0.001
+  slope_15m: 0.0002
+  slope_30m: 0.0001
+  breadth_fraction: 0.60
+  high_realized_vol: 0.005
+  high_range_vol: 0.01
+  high_vix: 25
+  opening_gap: 0.015
+  stabilization_seconds: 900
+  shock_window_seconds: 1800
+  confirmation_count: 2
+  min_duration_seconds: 600
+  max_confirmation_gap_seconds: 600
+  feature_max_age_seconds: 300
+  health_max_age_seconds: 30
+  flicker_window_seconds: 900
+  trend_multiplier: 1.0
+  chop_multiplier: 0.5
+  high_vol_multiplier: 0.25
 data_quality:
   # Research/paper quality screening values, not calibrated production thresholds.
   abnormal_gap_fraction: "0.10"
