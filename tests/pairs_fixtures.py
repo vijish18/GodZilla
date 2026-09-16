@@ -91,6 +91,10 @@ def pairs_inputs(checker, *, cointegrated=True, z=2.5, seed=7):
     state = state.model_copy(
         update={
             "timestamp": at,
+            "state_since": at,
+            "evidence": state.evidence.model_copy(
+                update={"health": state.evidence.health.model_copy(update={"observed_at": at})}
+            ),
             "state": MarketState.CHOP,
             "allowed_alpha_families": (AlphaFamily.PAIRS_STAT_ARB,),
             "directional_sides": (),

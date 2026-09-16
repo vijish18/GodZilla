@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import time
+from decimal import Decimal
 from enum import StrEnum
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -20,8 +21,10 @@ from godzilla.alphas.relative_value_models import RelativeValueSettings
 from godzilla.alphas.vwap_models import VwapSettings
 from godzilla.compliance.models import ComplianceProfile
 from godzilla.config.modes import SystemState, TradingMode
+from godzilla.ensemble.models import AlphaHealthSettings, AlphaRegistry
 from godzilla.market_data.quality import DataQualitySettings
 from godzilla.market_state.models import RouterSettings
+from godzilla.portfolio.models import AllocatorSettings
 
 __all__ = ["Settings", "SystemState", "TradingMode"]
 
@@ -176,6 +179,9 @@ class Settings(BaseSettings):
     pairs: PairsSettings = PairsSettings()
     vwap_reversion: VwapSettings = VwapSettings()
     relative_value: RelativeValueSettings = RelativeValueSettings()
+    alpha_registry: AlphaRegistry = AlphaRegistry()
+    alpha_health: AlphaHealthSettings = AlphaHealthSettings()
+    allocator: AllocatorSettings = AllocatorSettings()
     secrets: SecretSettings = SecretSettings()
 
     @field_validator("mode", mode="before")
@@ -194,6 +200,30 @@ class Settings(BaseSettings):
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         del settings_cls, dotenv_settings, file_secret_settings
         return env_settings, init_settings
+
+    @model_validator(mode="after")
+    def allocation_policy_bounds(self) -> Settings:
+        comparisons = (
+            (self.allocator.max_alpha, self.alphas.max_alpha_capital_fraction),
+            (self.allocator.max_gross, self.risk.max_gross_notional),
+            (self.allocator.max_net, self.risk.max_net_directional),
+            (self.allocator.max_open_risk, self.risk.max_open_portfolio_risk),
+            (self.allocator.max_adv_participation, self.universe.max_adv_participation),
+        )
+        if any(value > Decimal(str(limit)) for value, limit in comparisons):
+            raise ValueError("allocator caps cannot exceed configured portfolio/risk limits")
+        if (
+            self.allocator.max_groups > self.risk.max_positions
+            or self.allocator.max_sector_groups > self.risk.max_positions_per_sector
+        ):
+            raise ValueError("allocator group caps cannot exceed configured position limits")
+        if any(
+            entry.enabled
+            and getattr(self.alphas, entry.alpha_id.value) is AlphaAvailability.DISABLED
+            for entry in self.alpha_registry.entries
+        ):
+            raise ValueError("registry cannot enable a disabled alpha")
+        return self
 
     @model_validator(mode="after")
     def validate_live_prerequisites(self) -> Settings:

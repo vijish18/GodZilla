@@ -15,9 +15,11 @@ from godzilla.alphas.pairs_models import PairSignalIntent
 from godzilla.alphas.relative_value_models import RelativeValueIntent
 from godzilla.alphas.vwap_models import VwapSignalEvidence
 from godzilla.config.modes import SystemState, TradingMode
+from godzilla.ensemble.models import AlphaHealthSnapshot
 from godzilla.features.models import FeatureSetVersion, FeatureSnapshot
 from godzilla.market_data.models import Bar, Quote, utc
 from godzilla.market_state.models import StateDecision
+from godzilla.portfolio.models import EnsembleDecision, PortfolioDecision
 
 
 class FrozenModel(BaseModel):
@@ -123,6 +125,20 @@ class Decision(FrozenModel):
     intent_id: UUID
     accepted: bool
     reasons: tuple[str, ...]
+    ensemble: EnsembleDecision | None = None
+    portfolio: PortfolioDecision | None = None
+
+    @model_validator(mode="after")
+    def allocation_kind(self) -> Decision:
+        if self.ensemble is not None and (
+            self.kind != "ENSEMBLE_DECISION" or self.decision_id != self.ensemble.decision_id
+        ):
+            raise ValueError("ensemble payload identity mismatch")
+        if self.portfolio is not None and (
+            self.kind != "PORTFOLIO_DECISION" or self.decision_id != self.portfolio.decision_id
+        ):
+            raise ValueError("portfolio payload identity mismatch")
+        return self
 
 
 class OrderEvent(FrozenModel):
@@ -170,6 +186,7 @@ class Health(FrozenModel):
     status: Literal["HEALTHY", "UNKNOWN", "DEGRADED", "UNHEALTHY"]
     blocking: bool
     reason: str
+    alpha_snapshot: AlphaHealthSnapshot | None = None
 
 
 Payload = Annotated[
@@ -223,6 +240,13 @@ class EventEnvelope(FrozenModel):
         elif isinstance(self.payload, SignalIntent) and self.payload.evidence is not None:
             if self.payload.evidence.timestamp != self.occurred_at:
                 raise ValueError("signal time disagrees with evidence")
+        elif isinstance(self.payload, Decision):
+            detail = self.payload.ensemble or self.payload.portfolio
+            if detail is not None and detail.timestamp != self.occurred_at:
+                raise ValueError("allocation decision timestamp mismatch")
+        elif isinstance(self.payload, Health) and self.payload.alpha_snapshot is not None:
+            if self.payload.alpha_snapshot.timestamp != self.occurred_at:
+                raise ValueError("alpha health timestamp mismatch")
         elif (
             isinstance(self.payload, PairSignalIntent | RelativeValueIntent)
             and self.payload.timestamp != self.occurred_at

@@ -11,27 +11,34 @@ from godzilla.alphas.pairs_models import PairSignalIntent
 from godzilla.alphas.relative_value_models import RelativeValueIntent
 from godzilla.core.events.models import (
     BarClose,
+    Decision,
     EventEnvelope,
     FeatureUpdate,
+    Health,
     MarketStateUpdate,
     QuoteUpdate,
     SignalIntent,
     SystemStateSnapshot,
 )
 from godzilla.core.events.serialization import event_hash
+from godzilla.ensemble.models import AlphaHealthSnapshot
 from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
 from godzilla.market_state.models import StateDecision
+from godzilla.portfolio.models import EnsembleDecision, PortfolioDecision
 from godzilla.storage.models import (
+    AlphaHealthRow,
     AlphaSignalRow,
     AuditEventRow,
     Bar1mRow,
     Bar5mRow,
+    EnsembleDecisionRow,
     FeatureSnapshotRow,
     FeatureVersionRow,
     InstrumentRow,
     InstrumentVersionRow,
     MarketStateRow,
+    PortfolioDecisionRow,
     ProvenanceVersionRow,
     QuoteRow,
     SystemStateRow,
@@ -135,6 +142,38 @@ class PostgresRepository:
 
     @staticmethod
     def _project(session: Session, event: EventEnvelope) -> None:
+        if isinstance(event.payload, Health) and event.payload.alpha_snapshot is not None:
+            health = event.payload.alpha_snapshot
+            session.add(
+                AlphaHealthRow(
+                    snapshot_hash=health.snapshot_hash(),
+                    event_id=event.event_id,
+                    alpha_id=health.alpha_id.value,
+                    timestamp=health.timestamp,
+                    payload=health.model_dump(mode="json"),
+                )
+            )
+        if isinstance(event.payload, Decision):
+            if event.payload.ensemble is not None:
+                ensemble = event.payload.ensemble
+                session.add(
+                    EnsembleDecisionRow(
+                        decision_id=ensemble.decision_id,
+                        event_id=event.event_id,
+                        timestamp=ensemble.timestamp,
+                        payload=ensemble.model_dump(mode="json"),
+                    )
+                )
+            if event.payload.portfolio is not None:
+                portfolio = event.payload.portfolio
+                session.add(
+                    PortfolioDecisionRow(
+                        decision_id=portfolio.decision_id,
+                        event_id=event.event_id,
+                        timestamp=portfolio.timestamp,
+                        payload=portfolio.model_dump(mode="json"),
+                    )
+                )
         if isinstance(event.payload, RelativeValueIntent):
             rv = event.payload
             session.add(
@@ -367,3 +406,46 @@ class PostgresRepository:
             if original != intent:
                 raise ValueError("alpha signal integrity failure")
             return intent
+
+    def get_alpha_health(self, snapshot_hash: str) -> AlphaHealthSnapshot | None:
+        with Session(self.engine) as session:
+            row = session.get(AlphaHealthRow, snapshot_hash)
+            if row is None:
+                return None
+            value = AlphaHealthSnapshot.model_validate(row.payload)
+            original = next(
+                (e.payload for e in self.read_events() if e.event_id == row.event_id), None
+            )
+            if (
+                not isinstance(original, Health)
+                or original.alpha_snapshot != value
+                or value.snapshot_hash() != snapshot_hash
+            ):
+                raise ValueError("alpha health integrity failure")
+            return value
+
+    def get_ensemble_decision(self, decision_id: UUID) -> EnsembleDecision | None:
+        with Session(self.engine) as session:
+            row = session.get(EnsembleDecisionRow, decision_id)
+            if row is None:
+                return None
+            value = EnsembleDecision.model_validate(row.payload)
+            original = next(
+                (e.payload for e in self.read_events() if e.event_id == row.event_id), None
+            )
+            if not isinstance(original, Decision) or original.ensemble != value:
+                raise ValueError("ensemble integrity failure")
+            return value
+
+    def get_portfolio_decision(self, decision_id: UUID) -> PortfolioDecision | None:
+        with Session(self.engine) as session:
+            row = session.get(PortfolioDecisionRow, decision_id)
+            if row is None:
+                return None
+            value = PortfolioDecision.model_validate(row.payload)
+            original = next(
+                (e.payload for e in self.read_events() if e.event_id == row.event_id), None
+            )
+            if not isinstance(original, Decision) or original.portfolio != value:
+                raise ValueError("portfolio integrity failure")
+            return value

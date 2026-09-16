@@ -6,9 +6,11 @@ from uuid import UUID
 from godzilla.alphas.pairs_models import PairSignalIntent
 from godzilla.alphas.relative_value_models import RelativeValueIntent
 from godzilla.core.events.models import EventEnvelope, SignalIntent, SystemStateSnapshot
+from godzilla.ensemble.models import AlphaHealthSnapshot
 from godzilla.features.models import FeatureSnapshot
 from godzilla.market_data.instruments import InstrumentMasterSnapshot
 from godzilla.market_state.models import StateDecision
+from godzilla.portfolio.models import EnsembleDecision, PortfolioDecision
 
 
 class EventRepository(Protocol):
@@ -43,3 +45,9 @@ class AlphaSignalRepository(Protocol):
     def get_alpha_signal(
         self, signal_id: UUID
     ) -> SignalIntent | PairSignalIntent | RelativeValueIntent | None: ...
+
+
+class AllocationRepository(Protocol):
+    def get_alpha_health(self, snapshot_hash: str) -> AlphaHealthSnapshot | None: ...
+    def get_ensemble_decision(self, decision_id: UUID) -> EnsembleDecision | None: ...
+    def get_portfolio_decision(self, decision_id: UUID) -> PortfolioDecision | None: ...

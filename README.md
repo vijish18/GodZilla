@@ -16,6 +16,12 @@ an execution plan can reach a broker adapter. Risk-critical uncertainty fails cl
 
 ## Current capabilities
 
+Phase 12 adds the five-alpha registry, bounded rolling health, conflict resolution and a
+constrained portfolio allocator. Outputs are proposed equity-fraction targets requiring
+independent risk approval; LIVE allocation and execution remain disabled. Migration `0005`
+adds separate health, ensemble and portfolio projections. See
+[Phase 12](docs/phase-12-allocation.md) and [ADR-0012](docs/adr/ADR-0012-allocation.md).
+
 Phase 11 adds research sector leader/laggard pairs and baskets with training-only NIFTY beta
 estimates, net/beta exposure limits and stable-security inventory overlap checks. LIVE remains
 blocked pending independent validation. See the [Phase 11 contract](docs/phase-11-relative-value.md)

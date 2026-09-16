@@ -169,6 +169,31 @@ class AlphaSignalRow(Base):
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
 
 
+class AlphaHealthRow(Base):
+    __tablename__ = "alpha_health"
+    snapshot_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    event_id: Mapped[UUID] = mapped_column(ForeignKey("audit_events.event_id"), unique=True)
+    alpha_id: Mapped[str] = mapped_column(Text)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
+class EnsembleDecisionRow(Base):
+    __tablename__ = "ensemble_decisions"
+    decision_id: Mapped[UUID] = mapped_column(primary_key=True)
+    event_id: Mapped[UUID] = mapped_column(ForeignKey("audit_events.event_id"), unique=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
+class PortfolioDecisionRow(Base):
+    __tablename__ = "portfolio_decisions"
+    decision_id: Mapped[UUID] = mapped_column(primary_key=True)
+    event_id: Mapped[UUID] = mapped_column(ForeignKey("audit_events.event_id"), unique=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
 class FeatureSnapshotRow(Base):
     __tablename__ = "feature_snapshots"
     snapshot_hash: Mapped[str] = mapped_column(String(64), primary_key=True)

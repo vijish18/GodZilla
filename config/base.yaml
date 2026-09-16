@@ -1,5 +1,43 @@
 mode: PAPER
 
+# Phase 12 research/paper budgets and bounds, not optimized or LIVE approved.
+alpha_registry:
+  version: alpha-registry-v1
+  entries:
+    - {alpha_id: cross_sectional_momentum, base_budget: '0.2', enabled: true, score_floor: 0, score_ceiling: 1}
+    - {alpha_id: momentum_breakout, base_budget: '0.2', enabled: true, score_floor: 0, score_ceiling: 1}
+    - {alpha_id: pairs_stat_arb, base_budget: '0.2', enabled: true, score_floor: 0, score_ceiling: 1}
+    - {alpha_id: vwap_mean_reversion, base_budget: '0.2', enabled: true, score_floor: 0, score_ceiling: 1}
+    - {alpha_id: sector_relative_value, base_budget: '0.2', enabled: true, score_floor: 0, score_ceiling: 1}
+alpha_health:
+  version: alpha-health-v1
+  window_trades: 100
+  minimum_trades: 20
+  minimum_multiplier: 0
+  initial_multiplier: 0.5
+  maximum_multiplier: 1
+  max_increase: 0.05
+  increase_interval_seconds: 86400
+  max_return_drawdown: 0.05
+  health_max_age_seconds: 86400
+allocator:
+  version: portfolio-research-v1
+  max_alpha: '0.4'
+  max_gross: '1'
+  max_net: '0.6'
+  max_symbol: '0.15'
+  max_sector: '0.4'
+  max_open_risk: '0.01'
+  max_candidate_risk: '0.0025'
+  max_groups: 4
+  max_sector_groups: 2
+  max_adv_participation: '0.0025'
+  max_turnover_participation: '0.0025'
+  max_input_age_seconds: 30
+  correlation_threshold: '0.7'
+  correlation_penalty: '1'
+  sector_duplication_penalty: '0.5'
+
 # Phase 11 research/paper hypotheses; no independent validation or LIVE promotion.
 relative_value:
   version: sector-rv-research-v1
